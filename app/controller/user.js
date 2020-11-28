@@ -17,6 +17,40 @@ class UserController extends Controller {
     });
     ctx.body = [{ id: 123 }];
   }
+
+  async detail() {
+    const { ctx } = this;
+    const res = await ctx.service.user.detail(ctx.query.id);
+    ctx.body = res;
+  }
+
+  async detail2() {
+    const { ctx } = this;
+    ctx.body = ctx.params.id;
+  }
+
+  async add() {
+    const { ctx } = this;
+    const rule = {
+      name: { type: 'string' },
+      age: { type: 'number' },
+    };
+    ctx.validate(rule);
+    ctx.body = {
+      status: 200,
+      data: ctx.request.body,
+    };
+  }
+
+  async edit() {
+    const { ctx } = this;
+    ctx.body = ctx.request.body;
+  }
+
+  async del() {
+    const { ctx } = this;
+    ctx.body = ctx.request.body.id;
+  }
 }
 
 module.exports = UserController;

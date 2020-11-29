@@ -5,7 +5,16 @@ const Controller = require('egg').Controller;
 class UserController extends Controller {
   async index() {
     const { ctx } = this;
-    ctx.body = 'user index';
+    // ctx.body = 'user index';
+    await ctx.render('user.html', {
+      id: 100,
+      name: 'admin',
+      lists: [
+        'java',
+        'php',
+        'ts',
+      ],
+    });
   }
 
   async lists() {

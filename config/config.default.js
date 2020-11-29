@@ -24,6 +24,16 @@ module.exports = appInfo => {
     },
   };
 
+  config.view = {
+    mapping: {
+      '.html': 'ejs',
+    },
+  };
+
+  config.ejs = {
+
+  };
+
   // add your user config here
   const userConfig = {
     // myAppName: 'egg',

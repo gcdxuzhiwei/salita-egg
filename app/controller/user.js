@@ -18,7 +18,8 @@ class UserController extends Controller {
   }
 
   async lists() {
-    const { ctx } = this;
+    const { ctx, app } = this;
+    console.log(app.mysql);
     await new Promise(resolve => {
       setTimeout(() => {
         resolve();

@@ -18,8 +18,8 @@ class UtilsController extends Controller {
       // 文件名为：时间戳+随机字符串+.文件后缀
       const filename = (new Date()).getTime() + Math.random().toString(36).substr(2) + path.extname(stream.filename).toLocaleLowerCase();
       // 上传图片的目录
-      const target = './' + filename;
-      img_list.push('./' + filename);
+      const target = '../public/' + filename;
+      img_list.push(filename);
       const writeStream = fs.createWriteStream(target);
       await pump(stream, writeStream);
     }

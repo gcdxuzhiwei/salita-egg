@@ -41,11 +41,11 @@ module.exports = appInfo => {
     app: true,
     agent: false,
     client: {
-      host: '127.0.0.1',
+      host: '47.103.217.181',
       port: '3306',
-      user: 'root',
+      user: 'xuzhiwei',
       password: 'Xzw1048134347',
-      database: 'xu',
+      database: 'teach',
     },
   };
 

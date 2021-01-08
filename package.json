@@ -7,11 +7,14 @@
     "declarations": true
   },
   "dependencies": {
+    "crypto": "^1.0.1",
     "egg": "^2.15.1",
     "egg-mysql": "^3.0.0",
     "egg-scripts": "^2.11.0",
     "egg-validate": "^2.0.2",
-    "egg-view-ejs": "^2.0.1"
+    "egg-view-ejs": "^2.0.1",
+    "moment": "^2.29.1",
+    "mz-modules": "^2.1.0"
   },
   "devDependencies": {
     "autod": "^3.0.1",

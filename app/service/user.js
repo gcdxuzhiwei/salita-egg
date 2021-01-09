@@ -31,22 +31,25 @@ class UserService extends Service {
 
   async login(data) {
     const { app, service, ctx } = this;
-    const count = await app.mysql.get('user', {
-      phone: data.phone,
-    });
-    if (!count) {
-      return { err: '用户不存在' };
-    } else if (service.utils.encrypt(data.password) !== count.password) {
-      return { err: '密码错误' };
+    try {
+      const count = await app.mysql.get('user', {
+        phone: data.phone,
+      });
+      if (!count || service.utils.encrypt(data.password) !== count.password) {
+        return { err: '手机号或密码错误' };
+      }
+      const option = {
+        encrypt: true,
+        httpOnly: false,
+      };
+      if (data.save) {
+        option.maxAge = 7 * 24 * 60 * 60 * 1000;
+      }
+      ctx.cookies.set('umiId', count.userId, option);
+      return { success: true };
+    } catch (e) {
+      return { err: '服务器异常' };
     }
-    const option = {
-      encrypt: true,
-    };
-    if (data.save) {
-      option.maxAge = 7 * 24 * 60 * 60 * 1000;
-    }
-    ctx.cookies.set('umiId', count.userId, option);
-    return { success: true };
   }
 }
 

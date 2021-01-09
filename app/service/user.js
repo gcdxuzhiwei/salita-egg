@@ -6,24 +6,27 @@ const moment = require('moment');
 class UserService extends Service {
   async register(data) {
     const { app, service } = this;
-    if (
-      await app.mysql.get('user', {
+    try {
+      if (
+        await app.mysql.get('user', {
+          phone: data.phone,
+        })
+      ) {
+        return { err: '该手机号已被注册' };
+      }
+      const res = await app.mysql.insert('user', {
+        userId: service.utils.uuid(),
         phone: data.phone,
-      })
-    ) {
-      return { err: '该手机号已被注册' };
+        password: service.utils.encrypt(data.password),
+        lastLogin: moment().format(),
+      });
+      if (res.affectedRows === 1) {
+        return { success: true };
+      }
+      return { err: '系统繁忙' };
+    } catch (e) {
+      return { err: '服务器异常' };
     }
-    console.log(data.phone - 0);
-    const res = await app.mysql.insert('user', {
-      userId: service.utils.uuid(),
-      phone: data.phone,
-      password: service.utils.encrypt(data.password),
-      lastLogin: moment().format(),
-    });
-    if (res.affectedRows === 1) {
-      return { success: true };
-    }
-    return { err: '系统繁忙' };
   }
 
   async login(data) {
@@ -39,7 +42,9 @@ class UserService extends Service {
     const option = {
       encrypt: true,
     };
-    if (data.save) { option.maxAge = 7 * 24 * 60 * 60 * 1000; }
+    if (data.save) {
+      option.maxAge = 7 * 24 * 60 * 60 * 1000;
+    }
     ctx.cookies.set('umiId', count.userId, option);
     return { success: true };
   }

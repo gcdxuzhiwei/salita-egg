@@ -14,6 +14,12 @@ class UserController extends Controller {
     const res = await service.user.login(ctx.request.body);
     ctx.body = res;
   }
+
+  async setAction() {
+    const { ctx, service } = this;
+    const res = await service.user.setAction();
+    ctx.body = res;
+  }
 }
 
 module.exports = UserController;

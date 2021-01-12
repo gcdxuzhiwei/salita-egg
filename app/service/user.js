@@ -1,20 +1,20 @@
-"use strict";
+'use strict';
 
-const Service = require("egg").Service;
-const moment = require("moment");
+const Service = require('egg').Service;
+const moment = require('moment');
 
 class UserService extends Service {
   async register(data) {
     const { app, service } = this;
     try {
       if (
-        await app.mysql.get("user", {
+        await app.mysql.get('user', {
           phone: data.phone,
         })
       ) {
-        return { err: "该手机号已被注册" };
+        return { err: '该手机号已被注册' };
       }
-      const res = await app.mysql.insert("user", {
+      const res = await app.mysql.insert('user', {
         userId: service.utils.uuid(),
         phone: data.phone,
         password: service.utils.encrypt(data.password),
@@ -22,20 +22,20 @@ class UserService extends Service {
       if (res.affectedRows === 1) {
         return { success: true };
       }
-      return { err: "系统繁忙" };
+      return { err: '系统繁忙' };
     } catch (e) {
-      return { err: "服务器异常" };
+      return { err: '服务器异常' };
     }
   }
 
   async login(data) {
     const { app, service, ctx } = this;
     try {
-      const count = await app.mysql.get("user", {
+      const count = await app.mysql.get('user', {
         phone: data.phone,
       });
       if (!count || service.utils.encrypt(data.password) !== count.password) {
-        return { err: "手机号或密码错误" };
+        return { err: '手机号或密码错误' };
       }
       const option = {
         encrypt: true,
@@ -44,19 +44,19 @@ class UserService extends Service {
       if (data.save) {
         option.maxAge = 7 * 24 * 60 * 60 * 1000;
       }
-      ctx.cookies.set("umiId", count.userId, option);
+      ctx.cookies.set('umiId', count.userId, option);
       return { success: true };
     } catch (e) {
-      return { err: "服务器异常" };
+      return { err: '服务器异常' };
     }
   }
 
   async setAction() {
     const { ctx, app } = this;
     try {
-      const cookie = ctx.cookies.get("umiId", { encrypt: true });
+      const cookie = ctx.cookies.get('umiId', { encrypt: true });
       const res = await app.mysql.update(
-        "user",
+        'user',
         {
           lastLogin: moment().format(),
         },
@@ -66,9 +66,9 @@ class UserService extends Service {
           },
         }
       );
-      return res.affectedRows === 1 ? { success: true } : { err: "系统繁忙" };
+      return res.affectedRows === 1 ? { success: true } : { err: '系统繁忙' };
     } catch (e) {
-      return { err: "服务器异常" };
+      return { err: '服务器异常' };
     }
   }
 }

@@ -1,5 +1,5 @@
 'use strict';
-// test
+
 /**
  * @param {Egg.Application} app - egg application
  */

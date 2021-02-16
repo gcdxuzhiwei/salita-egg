@@ -66,7 +66,10 @@ class UserService extends Service {
           },
         }
       );
-      return res.affectedRows === 1 ? { success: true } : { err: '系统繁忙' };
+      const { role } = await app.mysql.get('user', {
+        userId: cookie,
+      });
+      return res.affectedRows === 1 ? { success: true, role } : { err: '系统繁忙' };
     } catch (e) {
       return { err: '服务器异常' };
     }

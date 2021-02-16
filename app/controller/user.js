@@ -20,6 +20,11 @@ class UserController extends Controller {
     const res = await service.user.setAction();
     ctx.body = res;
   }
+
+  async info() {
+    const { ctx } = this;
+    ctx.body = 123;
+  }
 }
 
 module.exports = UserController;

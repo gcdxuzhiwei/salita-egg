@@ -22,8 +22,15 @@ class UserController extends Controller {
   }
 
   async info() {
-    const { ctx } = this;
-    ctx.body = 123;
+    const { ctx, service } = this;
+    const res = await service.user.info();
+    ctx.body = res;
+  }
+
+  async changeInfo() {
+    const { ctx, service } = this;
+    const res = await service.user.changeInfo();
+    ctx.body = res;
   }
 }
 

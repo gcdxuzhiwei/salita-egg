@@ -69,7 +69,45 @@ class UserService extends Service {
       const { role } = await app.mysql.get('user', {
         userId: cookie,
       });
-      return res.affectedRows === 1 ? { success: true, role } : { err: '系统繁忙' };
+      return res.affectedRows === 1
+        ? { success: true, role }
+        : { err: '系统繁忙' };
+    } catch (e) {
+      return { err: '服务器异常' };
+    }
+  }
+
+  async info() {
+    try {
+      const { ctx, app } = this;
+      const cookie = ctx.cookies.get('umiId', { encrypt: true });
+      const res = await app.mysql.get('user', {
+        userId: cookie,
+      });
+      if (!res.password) {
+        return { err: '系统繁忙' };
+      }
+      delete res.password;
+      delete res.userId;
+      return res;
+    } catch (e) {
+      return { err: '服务器异常' };
+    }
+  }
+
+  async changeInfo() {
+    try {
+      const { ctx, app } = this;
+      const cookie = ctx.cookies.get('umiId', { encrypt: true });
+      const res = await app.mysql.update('user', ctx.request.body, {
+        where: {
+          userId: cookie,
+        },
+      });
+      if (res.affectedRows === 1) {
+        return { success: true };
+      }
+      return { err: '系统繁忙' };
     } catch (e) {
       return { err: '服务器异常' };
     }

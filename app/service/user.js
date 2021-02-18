@@ -112,6 +112,27 @@ class UserService extends Service {
       return { err: '服务器异常' };
     }
   }
+
+  async joinState() {
+    try {
+      const { ctx, app } = this;
+      const cookie = ctx.cookies.get('umiId', { encrypt: true });
+      const res = await app.mysql.get('user', {
+        userId: cookie,
+      });
+      if (res.role === 2) {
+        return { state: 2 };
+      }
+
+      const flag = await app.mysql.get('join', {
+        userId: cookie,
+      });
+
+      return { state: flag ? 1 : 0 };
+    } catch (e) {
+      return { err: '服务器异常' };
+    }
+  }
 }
 
 module.exports = UserService;

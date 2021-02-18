@@ -12,4 +12,5 @@ module.exports = app => {
   router.post('/api/user/setAction', controller.user.setAction);
   router.post('/api/user/info', controller.user.info);
   router.post('/api/user/changeInfo', controller.user.changeInfo);
+  router.post('/api/user/joinState', controller.user.joinState);
 };

@@ -133,6 +133,24 @@ class UserService extends Service {
       return { err: '服务器异常' };
     }
   }
+
+  async teacherJoin(data) {
+    try {
+      const { ctx, app } = this;
+      const cookie = ctx.cookies.get('umiId', { encrypt: true });
+      const res = await app.mysql.insert('join', {
+        userId: cookie,
+        isTeacher: data.isTeacher,
+        imageUrl: data.imageUrl,
+      });
+      if (res.affectedRows === 1) {
+        return { success: true };
+      }
+      return { err: '系统繁忙' };
+    } catch (e) {
+      return { err: '服务器异常' };
+    }
+  }
 }
 
 module.exports = UserService;

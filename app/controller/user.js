@@ -38,6 +38,12 @@ class UserController extends Controller {
     const res = await service.user.joinState();
     ctx.body = res;
   }
+
+  async teacherJoin() {
+    const { ctx, service } = this;
+    const res = await service.user.teacherJoin(ctx.request.body);
+    ctx.body = res;
+  }
 }
 
 module.exports = UserController;

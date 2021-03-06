@@ -142,6 +142,9 @@ class UserService extends Service {
         userId: cookie,
         isTeacher: data.isTeacher,
         imageUrl: data.imageUrl,
+        school: data.school,
+        profession: data.profession,
+        level: data.level,
       });
       if (res.affectedRows === 1) {
         return { success: true };

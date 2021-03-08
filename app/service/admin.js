@@ -16,6 +16,9 @@ class AdminService extends Service {
         encrypt: true,
         httpOnly: false,
       };
+      if (data.save) {
+        option.maxAge = 7 * 24 * 60 * 60 * 1000;
+      }
       ctx.cookies.set('adminId', count.adminId, option);
       return { success: true };
     } catch (e) {
@@ -30,7 +33,9 @@ class AdminService extends Service {
       const res = await app.mysql.get('admin', {
         adminId: cookie,
       });
-      return res.role ? { role: res.role, name: res.userName } : { err: '系统繁忙' };
+      return res.role
+        ? { role: res.role, name: res.userName, avatar: res.avatar }
+        : { err: '系统繁忙' };
     } catch (e) {
       return { err: '服务器异常' };
     }

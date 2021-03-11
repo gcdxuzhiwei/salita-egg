@@ -126,6 +126,18 @@ class UserService extends Service {
         });
       }
 
+      if (role === 2) {
+        app.mysql.update(
+          'join',
+          { time: new Date().getTime() },
+          {
+            where: {
+              userId: cookie,
+            },
+          }
+        );
+      }
+
       return res.affectedRows === 1
         ? { success: true, role }
         : { err: '系统繁忙' };
@@ -272,7 +284,9 @@ class UserService extends Service {
             where: { userId: cookie },
           }
         );
-        return change.affectedRows === 1 ? { success: true } : { err: '发布失败' };
+        return change.affectedRows === 1
+          ? { success: true }
+          : { err: '发布失败' };
       }
       if (!res.age || !res.name || !res.area) {
         return { err: '请先去我的页面完善个人基本信息' };
@@ -287,8 +301,75 @@ class UserService extends Service {
             where: { userId: cookie },
           }
         );
-        return change.affectedRows === 1 ? { success: true } : { err: '发布失败' };
+        return change.affectedRows === 1
+          ? { success: true }
+          : { err: '发布失败' };
       }
+    } catch (e) {
+      return { err: '服务器异常' };
+    }
+  }
+
+  async teacherList(data) {
+    try {
+      const { app } = this;
+      const group3 = data.group3.split('').map(v => (v - 0));
+      const res = await app.mysql.select('join', {
+        where: { state: 1, visible: 1, isTeacher: group3 },
+        orders: [[ 'time', 'desc' ]],
+      });
+
+      // 先去掉时间往后的
+      const xTime = data.lastTime || new Date().getTime();
+      while (res.length && res[0].time > xTime) {
+        res.shift();
+      }
+
+      const realRes = [];
+      // 再筛选
+      let flag = !!res.length;
+      while (flag) {
+        let shouldNotSave = false;
+        const xGroup1 = res[0].group1.split('');
+        const xGroup2 = res[0].group2.split('');
+        if (data.group1) {
+          shouldNotSave = shouldNotSave || data.group1.split('').reduce((pre, val) => {
+            return (pre || !xGroup1.includes(val));
+          }, false);
+        }
+
+        if (data.group2) {
+          shouldNotSave = shouldNotSave || data.group2.split('').reduce((pre, val) => {
+            return (pre || !xGroup2.includes(val));
+          }, false);
+        }
+
+        const item = res.shift();
+        if (!shouldNotSave) {
+          realRes.push(item);
+        }
+
+        if (realRes.length === 10 || !res.length) {
+          flag = false;
+        }
+      }
+
+      for (let i = 0; i < realRes.length; i++) {
+        const info = await app.mysql.get('user', {
+          userId: realRes[i].userId,
+        });
+        realRes[i] = {
+          ...realRes[i],
+          ...info,
+        };
+
+        delete realRes[i].imageUrl;
+        delete realRes[i].state;
+        delete realRes[i].visible;
+        delete realRes[i].password;
+      }
+
+      return { arr: realRes, lastTime: realRes.length === 10 ? realRes[realRes.length - 1].time : 0 };
     } catch (e) {
       return { err: '服务器异常' };
     }

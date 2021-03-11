@@ -40,6 +40,73 @@ class AdminService extends Service {
       return { err: '服务器异常' };
     }
   }
+
+  async getAction() {
+    const { app } = this;
+    try {
+      const res = await app.mysql.select('action', {
+        orders: [[ 'day', 'desc' ]],
+        limit: 10,
+      });
+      const count = await app.mysql.count('user');
+      return { arr: res.reverse(), count };
+    } catch (e) {
+      return { err: '服务器异常' };
+    }
+  }
+
+  async getJoinTable(data) {
+    const { app } = this;
+    try {
+      const count = await app.mysql.count('join', {
+        state: 0,
+      });
+      const res = await app.mysql.select('join', {
+        where: { state: 0 },
+        order: [[ 'time', 'desc' ]],
+        limit: 10,
+        offset: (data.page - 1) * 10,
+      });
+      for (let i = 0; i < res.length; i++) {
+        const info = await app.mysql.get('user', {
+          userId: res[i].userId,
+        });
+        res[i].phone = info.phone;
+      }
+      return { res, count };
+    } catch (e) {
+      return { err: '服务器异常' };
+    }
+  }
+
+  async changeJoinState(data) {
+    const { app } = this;
+    try {
+      if (!data.canJoin) {
+        await app.mysql.delete('join', {
+          userId: data.userId,
+        });
+      } else {
+        await app.mysql.update(
+          'join',
+          {
+            state: 1,
+          },
+          {
+            where: { userId: data.userId },
+          }
+        );
+        await app.mysql.update('user', {
+          role: 2,
+        }, {
+          where: { userId: data.userId },
+        });
+      }
+      return { success: true };
+    } catch (e) {
+      return { err: '服务器异常' };
+    }
+  }
 }
 
 module.exports = AdminService;

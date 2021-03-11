@@ -14,6 +14,24 @@ class AdminController extends Controller {
     const res = await service.admin.getRole();
     ctx.body = res;
   }
+
+  async getAction() {
+    const { ctx, service } = this;
+    const res = await service.admin.getAction();
+    ctx.body = res;
+  }
+
+  async getJoinTable() {
+    const { ctx, service } = this;
+    const res = await service.admin.getJoinTable(ctx.request.body);
+    ctx.body = res;
+  }
+
+  async changeJoinState() {
+    const { ctx, service } = this;
+    const res = await service.admin.changeJoinState(ctx.request.body);
+    ctx.body = res;
+  }
 }
 
 module.exports = AdminController;

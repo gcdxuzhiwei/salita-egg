@@ -44,6 +44,24 @@ class UserController extends Controller {
     const res = await service.user.teacherJoin(ctx.request.body);
     ctx.body = res;
   }
+
+  async teacherInfo() {
+    const { ctx, service } = this;
+    const res = await service.user.teacherInfo();
+    ctx.body = res;
+  }
+
+  async teacherInfoChange() {
+    const { ctx, service } = this;
+    const res = await service.user.teacherInfoChange(ctx.request.body);
+    ctx.body = res;
+  }
+
+  async teacherChangeVisible() {
+    const { ctx, service } = this;
+    const res = await service.user.teacherChangeVisible(ctx.request.body);
+    ctx.body = res;
+  }
 }
 
 module.exports = UserController;

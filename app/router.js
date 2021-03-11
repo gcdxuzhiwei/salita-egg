@@ -14,7 +14,13 @@ module.exports = app => {
   router.post('/api/user/changeInfo', controller.user.changeInfo);
   router.post('/api/user/joinState', controller.user.joinState);
   router.post('/api/user/teacherJoin', controller.user.teacherJoin);
+  router.post('/api/user/teacherInfo', controller.user.teacherInfo);
+  router.post('/api/user/teacherInfoChange', controller.user.teacherInfoChange);
+  router.post('/api/user/teacherChangeVisible', controller.user.teacherChangeVisible);
 
   router.post('/api/admin/login', controller.admin.login);
   router.post('/api/admin/getRole', controller.admin.getRole);
+  router.post('/api/admin/getAction', controller.admin.getAction);
+  router.post('/api/admin/getJoinTable', controller.admin.getJoinTable);
+  router.post('/api/admin/changeJoinState', controller.admin.changeJoinState);
 };

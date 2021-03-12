@@ -321,7 +321,7 @@ class UserService extends Service {
 
       // 先去掉时间往后的
       const xTime = data.lastTime || new Date().getTime();
-      while (res.length && res[0].time > xTime) {
+      while (res.length && res[0].time >= xTime) {
         res.shift();
       }
 

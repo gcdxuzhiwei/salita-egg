@@ -63,7 +63,7 @@ class AdminService extends Service {
       });
       const res = await app.mysql.select('join', {
         where: { state: 0 },
-        order: [[ 'time', 'desc' ]],
+        orders: [[ 'time', 'asc' ]],
         limit: 10,
         offset: (data.page - 1) * 10,
       });

@@ -24,4 +24,8 @@ module.exports = app => {
   router.post('/api/admin/getAction', controller.admin.getAction);
   router.post('/api/admin/getJoinTable', controller.admin.getJoinTable);
   router.post('/api/admin/changeJoinState', controller.admin.changeJoinState);
+  router.post('/api/admin/addAdmin', controller.admin.addAdmin);
+  router.post('/api/admin/list', controller.admin.list);
+  router.post('/api/admin/deleteAdmin', controller.admin.deleteAdmin);
+  router.post('/api/admin/changeAvatar', controller.admin.changeAvatar);
 };

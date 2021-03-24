@@ -1,6 +1,7 @@
 'use strict';
 
 const Service = require('egg').Service;
+const moment = require('moment');
 
 class AdminService extends Service {
   async login(data) {
@@ -96,13 +97,85 @@ class AdminService extends Service {
             where: { userId: data.userId },
           }
         );
-        await app.mysql.update('user', {
-          role: 2,
-        }, {
-          where: { userId: data.userId },
-        });
+        await app.mysql.update(
+          'user',
+          {
+            role: 2,
+          },
+          {
+            where: { userId: data.userId },
+          }
+        );
       }
       return { success: true };
+    } catch (e) {
+      return { err: '服务器异常' };
+    }
+  }
+
+  async addAdmin(data) {
+    const { app, service } = this;
+    try {
+      const { userName, password, role, remark } = data;
+      const list = await app.mysql.get('admin', { userName });
+      if (list) {
+        return { err: '用户名已被注册' };
+      }
+      const res = await app.mysql.insert('admin', {
+        adminId: service.utils.uuid(),
+        userName,
+        password: service.utils.encrypt(password),
+        role,
+        remark,
+        avatar: 'defaultAvatar.png',
+        createTime: moment().format(),
+      });
+      return res.affectedRows === 1 ? { success: true } : { err: '添加失败' };
+    } catch (e) {
+      console.log(e);
+      return { err: '服务器异常' };
+    }
+  }
+
+  async list() {
+    const { app } = this;
+    try {
+      const res = await app.mysql.select('admin', {
+        orders: [[ 'createTime', 'desc' ]],
+      });
+      res.forEach(v => {
+        delete v.password;
+      });
+      return { arr: res };
+    } catch (e) {
+      return { err: '服务器异常' };
+    }
+  }
+
+  async deleteAdmin(data) {
+    const { app } = this;
+    try {
+      const res = await app.mysql.delete('admin', {
+        adminId: data.adminId,
+      });
+      return res.affectedRows === 1 ? { success: true } : { err: '删除失败' };
+    } catch (e) {
+      return { err: '服务器异常' };
+    }
+  }
+
+  async changeAvatar(data) {
+    const { app, ctx } = this;
+    try {
+      const cookie = ctx.cookies.get('adminId', { encrypt: true });
+      const res = await app.mysql.update(
+        'admin',
+        { avatar: data.avatar },
+        {
+          where: { adminId: cookie },
+        }
+      );
+      return res.affectedRows === 1 ? { success: true } : { err: '修改失败' };
     } catch (e) {
       return { err: '服务器异常' };
     }

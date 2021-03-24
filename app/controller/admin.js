@@ -32,6 +32,30 @@ class AdminController extends Controller {
     const res = await service.admin.changeJoinState(ctx.request.body);
     ctx.body = res;
   }
+
+  async addAdmin() {
+    const { ctx, service } = this;
+    const res = await service.admin.addAdmin(ctx.request.body);
+    ctx.body = res;
+  }
+
+  async list() {
+    const { ctx, service } = this;
+    const res = await service.admin.list();
+    ctx.body = res;
+  }
+
+  async deleteAdmin() {
+    const { ctx, service } = this;
+    const res = await service.admin.deleteAdmin(ctx.request.body);
+    ctx.body = res;
+  }
+
+  async changeAvatar() {
+    const { ctx, service } = this;
+    const res = await service.admin.changeAvatar(ctx.request.body);
+    ctx.body = res;
+  }
 }
 
 module.exports = AdminController;

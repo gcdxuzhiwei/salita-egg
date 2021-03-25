@@ -68,6 +68,12 @@ class UserController extends Controller {
     const res = await service.user.teacherList(ctx.request.body);
     ctx.body = res;
   }
+
+  async userDetail() {
+    const { ctx, service } = this;
+    const res = await service.user.userDetail(ctx.request.body);
+    ctx.body = res;
+  }
 }
 
 module.exports = UserController;

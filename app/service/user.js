@@ -313,7 +313,7 @@ class UserService extends Service {
   async teacherList(data) {
     try {
       const { app } = this;
-      const group3 = data.group3.split('').map(v => (v - 0));
+      const group3 = data.group3.split('').map(v => v - 0);
       const res = await app.mysql.select('join', {
         where: { state: 1, visible: 1, isTeacher: group3 },
         orders: [[ 'time', 'desc' ]],
@@ -333,15 +333,19 @@ class UserService extends Service {
         const xGroup1 = res[0].group1.split('');
         const xGroup2 = res[0].group2.split('');
         if (data.group1) {
-          shouldNotSave = shouldNotSave || data.group1.split('').reduce((pre, val) => {
-            return (pre || !xGroup1.includes(val));
-          }, false);
+          shouldNotSave =
+            shouldNotSave ||
+            data.group1.split('').reduce((pre, val) => {
+              return pre || !xGroup1.includes(val);
+            }, false);
         }
 
         if (data.group2) {
-          shouldNotSave = shouldNotSave || data.group2.split('').reduce((pre, val) => {
-            return (pre || !xGroup2.includes(val));
-          }, false);
+          shouldNotSave =
+            shouldNotSave ||
+            data.group2.split('').reduce((pre, val) => {
+              return pre || !xGroup2.includes(val);
+            }, false);
         }
 
         const item = res.shift();
@@ -369,7 +373,42 @@ class UserService extends Service {
         delete realRes[i].password;
       }
 
-      return { arr: realRes, lastTime: realRes.length === 10 ? realRes[realRes.length - 1].time : 0 };
+      return {
+        arr: realRes,
+        lastTime: realRes.length === 10 ? realRes[realRes.length - 1].time : 0,
+      };
+    } catch (e) {
+      return { err: '服务器异常' };
+    }
+  }
+
+  async userDetail(data) {
+    try {
+      const { app } = this;
+      const res = await app.mysql.get('join', {
+        state: 1,
+        visible: 1,
+        userId: data.userId,
+      });
+      if (!res) { return { err: '查询失败' }; }
+      delete res.imageUrl;
+      app.mysql.update('join',
+        {
+          visitCount: res.visitCount + 1,
+        },
+        {
+          where: { userId: data.userId },
+        }
+      );
+      const info = await app.mysql.get('user', {
+        userId: data.userId,
+      });
+      delete info.password;
+      delete info.phone;
+      return { retdata: {
+        ...res,
+        ...info,
+      } };
     } catch (e) {
       return { err: '服务器异常' };
     }

@@ -390,9 +390,12 @@ class UserService extends Service {
         visible: 1,
         userId: data.userId,
       });
-      if (!res) { return { err: '查询失败' }; }
+      if (!res) {
+        return { err: '查询失败' };
+      }
       delete res.imageUrl;
-      app.mysql.update('join',
+      app.mysql.update(
+        'join',
         {
           visitCount: res.visitCount + 1,
         },
@@ -405,10 +408,69 @@ class UserService extends Service {
       });
       delete info.password;
       delete info.phone;
-      return { retdata: {
-        ...res,
-        ...info,
-      } };
+      return {
+        retdata: {
+          ...res,
+          ...info,
+        },
+      };
+    } catch (e) {
+      return { err: '服务器异常' };
+    }
+  }
+
+  // 0预约申请中 1预约成功 -1预约失败
+  async reserve(data) {
+    try {
+      const { app, ctx } = this;
+      const cookie = ctx.cookies.get('umiId', { encrypt: true });
+      const flag = await app.mysql.get('reserve', {
+        student: cookie,
+        teacher: data.teacher,
+        status: 0,
+      });
+      if (flag) {
+        return { err: '预约已经在申请中' };
+      }
+      const res = await app.mysql.insert('reserve', {
+        student: cookie,
+        teacher: data.teacher,
+        status: 0,
+        remark: data.remark,
+        time: new Date().getTime(),
+      });
+      return res.affectedRows === 1 ? { success: true } : { err: '预约失败' };
+    } catch (e) {
+      return { err: '服务器异常' };
+    }
+  }
+
+  async getReserve() {
+    try {
+      const { app, ctx } = this;
+      const cookie = ctx.cookies.get('umiId', { encrypt: true });
+      const arr = await app.mysql.select('reserve', {
+        where: {
+          student: cookie,
+        },
+        orders: [[ 'time', 'desc' ]],
+      });
+      for (let i = 0; i < arr.length; i++) {
+        const res = await app.mysql.get('join', {
+          userId: arr[i].teacher,
+        });
+        delete res.imageUrl;
+        const info = await app.mysql.get('user', {
+          userId: arr[i].teacher,
+        });
+        delete info.password;
+        delete info.phone;
+        arr[i].info = {
+          ...info,
+          ...res,
+        };
+      }
+      return { arr };
     } catch (e) {
       return { err: '服务器异常' };
     }

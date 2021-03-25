@@ -74,6 +74,18 @@ class UserController extends Controller {
     const res = await service.user.userDetail(ctx.request.body);
     ctx.body = res;
   }
+
+  async reserve() {
+    const { ctx, service } = this;
+    const res = await service.user.reserve(ctx.request.body);
+    ctx.body = res;
+  }
+
+  async getReserve() {
+    const { ctx, service } = this;
+    const res = await service.user.getReserve();
+    ctx.body = res;
+  }
 }
 
 module.exports = UserController;

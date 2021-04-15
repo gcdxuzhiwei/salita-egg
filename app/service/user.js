@@ -408,6 +408,12 @@ class UserService extends Service {
       });
       delete info.password;
       delete info.phone;
+      res.command = await app.mysql.select('command', {
+        where: {
+          teacher: data.userId,
+        },
+        orders: [[ 'time', 'desc' ]],
+      });
       return {
         retdata: {
           ...res,
@@ -424,6 +430,9 @@ class UserService extends Service {
     try {
       const { app, ctx } = this;
       const cookie = ctx.cookies.get('umiId', { encrypt: true });
+      if (cookie === data.teacher) {
+        return { err: '不能预约自己' };
+      }
       const flag = await app.mysql.get('reserve', {
         student: cookie,
         teacher: data.teacher,
@@ -471,6 +480,122 @@ class UserService extends Service {
         };
       }
       return { arr };
+    } catch (e) {
+      return { err: '服务器异常' };
+    }
+  }
+
+  async teacherReserveList() {
+    try {
+      const { app, ctx } = this;
+      const cookie = ctx.cookies.get('umiId', { encrypt: true });
+      const arr = await app.mysql.select('reserve', {
+        where: {
+          teacher: cookie,
+        },
+        orders: [[ 'time', 'desc' ]],
+      });
+      for (let i = 0; i < arr.length; i++) {
+        const info = await app.mysql.get('user', {
+          userId: arr[i].student,
+        });
+        delete info.password;
+        arr[i].info = {
+          ...info,
+        };
+      }
+      return { arr };
+    } catch (e) {
+      return { err: '服务器异常' };
+    }
+  }
+
+  async teacherChangeReserve(data) {
+    try {
+      const { app, ctx } = this;
+      const cookie = ctx.cookies.get('umiId', { encrypt: true });
+      const arr = await app.mysql.update(
+        'reserve',
+        {
+          status: data.status,
+        },
+        {
+          where: { student: data.student, teacher: cookie, status: 0 },
+        }
+      );
+      return arr.affectedRows === 1 ? { success: true } : { err: '修改失败' };
+    } catch (e) {
+      return { err: '服务器异常' };
+    }
+  }
+
+  async commandByReserve(data) {
+    try {
+      const { app, ctx, service } = this;
+      const cookie = ctx.cookies.get('umiId', { encrypt: true });
+      const res = await app.mysql.insert('command', {
+        student: cookie,
+        teacher: data.teacher,
+        time: new Date().getTime(),
+        detail: data.command,
+        commandId: service.utils.uuid(),
+      });
+      if (res.affectedRows === 1) {
+        await app.mysql.update(
+          'reserve',
+          {
+            command: 1,
+          },
+          {
+            where: { student: cookie, teacher: data.teacher, status: 1 },
+          }
+        );
+        return { success: true };
+      }
+      return { err: '评价失败' };
+    } catch (e) {
+      return { err: '服务器异常' };
+    }
+  }
+
+  async getId(data) {
+    try {
+      const { ctx, app } = this;
+      const cookie = ctx.cookies.get('umiId', { encrypt: true });
+      const teacher = data.teacher
+        ? await app.mysql.get('user', {
+          userId: data.teacher,
+        })
+        : '';
+      const user = await app.mysql.get('user', {
+        userId: cookie,
+      });
+      return {
+        id: cookie,
+        teacher: teacher ? teacher.avatar : '',
+        user: user.avatar,
+      };
+    } catch (e) {
+      return { err: '服务器异常' };
+    }
+  }
+
+  async chatListInfo(data) {
+    try {
+      const { app } = this;
+      const res = [];
+      let { ids } = data;
+      ids = ids.split(',');
+      for (let i = 0; i < ids.length; i++) {
+        const info = await app.mysql.get('user', {
+          userId: ids[i],
+        });
+        res.push({
+          avatar: info.avatar,
+          name: info.name,
+        });
+      }
+      return { res };
     } catch (e) {
       return { err: '服务器异常' };
     }

@@ -86,6 +86,36 @@ class UserController extends Controller {
     const res = await service.user.getReserve();
     ctx.body = res;
   }
+
+  async teacherReserveList() {
+    const { ctx, service } = this;
+    const res = await service.user.teacherReserveList();
+    ctx.body = res;
+  }
+
+  async teacherChangeReserve() {
+    const { ctx, service } = this;
+    const res = await service.user.teacherChangeReserve(ctx.request.body);
+    ctx.body = res;
+  }
+
+  async commandByReserve() {
+    const { ctx, service } = this;
+    const res = await service.user.commandByReserve(ctx.request.body);
+    ctx.body = res;
+  }
+
+  async getId() {
+    const { ctx, service } = this;
+    const res = await service.user.getId(ctx.request.body);
+    ctx.body = res;
+  }
+
+  async chatListInfo() {
+    const { ctx, service } = this;
+    const res = await service.user.chatListInfo(ctx.request.body);
+    ctx.body = res;
+  }
 }
 
 module.exports = UserController;

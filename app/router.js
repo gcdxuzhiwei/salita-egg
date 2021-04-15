@@ -16,11 +16,25 @@ module.exports = app => {
   router.post('/api/user/teacherJoin', controller.user.teacherJoin);
   router.post('/api/user/teacherInfo', controller.user.teacherInfo);
   router.post('/api/user/teacherInfoChange', controller.user.teacherInfoChange);
-  router.post('/api/user/teacherChangeVisible', controller.user.teacherChangeVisible);
+  router.post(
+    '/api/user/teacherChangeVisible',
+    controller.user.teacherChangeVisible
+  );
   router.post('/api/user/teacherList', controller.user.teacherList);
   router.post('/api/user/userDetail', controller.user.userDetail);
   router.post('/api/user/reserve', controller.user.reserve);
   router.post('/api/user/getReserve', controller.user.getReserve);
+  router.post(
+    '/api/user/teacherReserveList',
+    controller.user.teacherReserveList
+  );
+  router.post(
+    '/api/user/teacherChangeReserve',
+    controller.user.teacherChangeReserve
+  );
+  router.post('/api/user/commandByReserve', controller.user.commandByReserve);
+  router.post('/api/user/getId', controller.user.getId);
+  router.post('/api/user/chatListInfo', controller.user.chatListInfo);
 
   router.post('/api/admin/login', controller.admin.login);
   router.post('/api/admin/getRole', controller.admin.getRole);
